@@ -1,0 +1,35 @@
+CC=gcc
+LN=ld
+AS=as
+OBJ=build
+
+CFLAGS=-ffreestanding -O2 -Wall -Wextra -c -std=gnu99 -Wno-cpp
+
+CFLAGSL=-ffreestanding -O2 -nostdlib -lgcc
+
+myos.bin : gdt.o idt.o isrs.o kernel.o clib.o screen.o boot.o linker.ld
+	   $(CC) -T linker.ld boot.o gdt.o idt.o isrs.o kernel.o clib.o screen.o $(CFLAGSL) -o myos.bin
+
+kernel.o : kernel.c *.h
+	   $(CC) $(CFLAGS) kernel.c -o kernel.o
+
+clib.o   : clib.c *.h
+	   $(CC) $(CFLAGS) clib.c -o clib.o
+
+screen.o : screen.c *.h
+	   $(CC) $(CFLAGS) screen.c -o screen.o
+
+gdt.o    : gdt.c *.h
+	   $(CC) $(CFLAGS) gdt.c -o gdt.o
+
+idt.o    : idt.c *.h
+	   $(CC) $(CFLAGS) idt.c -o idt.o
+
+isrs.o   : isrs.c *.h
+	   $(CC) $(CFLAGS) isrs.c -o isrs.o
+
+boot.o	 : boot1.s
+	   $(AS) boot.s -o boot.o
+
+clean	 : *.o
+	   rm -rf *.o
